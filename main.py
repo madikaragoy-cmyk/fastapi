@@ -1,0 +1,15 @@
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get('/')
+def read_root():
+    return {"message": "Asalamualeykum"}
+
+@app.get('/sum')
+def get_sum(a: int, b: int):
+    return {"result": a + b}
+
+@app.get('/multiply')
+def get_multiply(a: int, b: int):
+    return {"result": a * b}
