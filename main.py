@@ -24,3 +24,7 @@ def test_divide():
     response = client.get("/divide?a=10&b=2")
     assert response.status_code == 200
     assert response.json() == {"result": 5.0}
+    
+@app.get('/goodbye/{name}.')
+def goodbye(name: str):
+    return {"message": f"Goodbye, {name}!"}

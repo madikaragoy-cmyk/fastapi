@@ -3,50 +3,47 @@ name: FastAPI CI
 on:
   push:
     branches: [ main ]
+  pull_request: 
+    branches: [ main ]
 
 jobs:
-  bulid:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Клонируем репозиторий
         uses: actions/checkout@v3
 
-      - name: Устанавливаем Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
+      - name: Устанавливаем Docker-Compose
+        run: sudo apt-get update && sudo apt-get install -y docker-compose
       
-      - name: Устанавливаем Зависимости
+      - name: Строим образ
         run: | 
-          pip install requirements.txt
+          docker-compose build
 
   test:
     runs-on: ubuntu-latest
-    needs: bulid
-    speps:
-      
-      - name: Запускаем Тесты
-        run: | 
-          pytest
-
-deploy:
-    runs-on: ubuntu-latest
-    needs: test
+    needs: build
 
     steps:
       - name: Клонируем репозиторий
         uses: actions/checkout@v3
 
-      - name: Создаем папку deploy
-        run: mkdir deploy
+      - name: Устанавливаем Docker-Compose
+        run: sudo apt-get update && sudo apt-get install -y docker-compose
+      
 
-      - name: Копируем проект в deploy
+      - name: Запускаем Тесты
+        run: | 
+          docker-compose run --rm test
+  
+  deploy:
+    runs-on: ubuntu-latest 
+    needs: test 
+    steps: 
+      - name: Клонируем репозиторий
+        uses: actions/checkout@v3
+
+      - name: Trigger Render Deploy 
         run: |
-          cp -r app deploy/ || true
-          cp requirements.txt deploy/ || true
-          cp main.py deploy/ || true
-
-      - name: Проверяем содержимое папки
-        run: ls -R deploy
-    
+          mkdir -p ../staging
+          cp -r . ../staging/
