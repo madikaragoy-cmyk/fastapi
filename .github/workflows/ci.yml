@@ -29,3 +29,24 @@ jobs:
       - name: Запускаем Тесты
         run: | 
           pytest
+
+deploy:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Клонируем репозиторий
+        uses: actions/checkout@v3
+
+      - name: Создаем папку deploy
+        run: mkdir deploy
+
+      - name: Копируем проект в deploy
+        run: |
+          cp -r app deploy/ || true
+          cp requirements.txt deploy/ || true
+          cp main.py deploy/ || true
+
+      - name: Проверяем содержимое папки
+        run: ls -R deploy
+    
